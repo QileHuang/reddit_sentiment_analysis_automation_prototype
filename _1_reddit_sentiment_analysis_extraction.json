@@ -1,0 +1,823 @@
+{
+  "name": "[1]reddit_sentiment_analysis_extraction",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appCGNT8w6bwFwLxY",
+          "mode": "list",
+          "cachedResultName": "social_media_automation",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblFkMIwWFPKC3NMp",
+          "mode": "list",
+          "cachedResultName": "subreddit",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY/tblFkMIwWFPKC3NMp"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "subreddit_id_t5": "={{ $json.subreddit_id_t5 }}",
+            "subscriber_count": "={{ $json.subscriber_count }}",
+            "subreddit_name": "={{ $json.subreddit_name }}",
+            "permalink": "={{ $json.permalink }}"
+          },
+          "matchingColumns": [
+            "subreddit_id_t5"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "subreddit_id_t5",
+              "displayName": "subreddit_id_t5",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "subreddit_name",
+              "displayName": "subreddit_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "subscriber_count",
+              "displayName": "subscriber_count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "permalink",
+              "displayName": "permalink",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "updateAllMatches": true
+        }
+      },
+      "id": "401b3120-3757-4df8-be10-21d80e07c013",
+      "name": "upsert_subreddit",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1180,
+        420
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fdcb8c87-cf20-4962-b02b-5606e11205bd",
+              "name": "subreddit_id_t5",
+              "value": "={{ $json.data.name }}",
+              "type": "string"
+            },
+            {
+              "id": "dc953f28-21ae-4f2e-9fc8-3f4a0431b165",
+              "name": "subreddit_name",
+              "value": "={{ $json.data.display_name_prefixed }}",
+              "type": "string"
+            },
+            {
+              "id": "5f3d96de-cb45-416d-bcdc-c59bbdae51fa",
+              "name": "subscriber_count",
+              "value": "={{ $json.data.subscribers }}",
+              "type": "string"
+            },
+            {
+              "id": "3fa36ac3-7ed2-4ffc-8388-94e14e8e128c",
+              "name": "permalink",
+              "value": "=https://www.reddit.com{{ $json.data.url }}",
+              "type": "string"
+            },
+            {
+              "id": "8fdd297c-4026-4e0e-859c-23033d1df22b",
+              "name": "subreddit_name_raw",
+              "value": "={{ $json.data.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "60e7af7c-983f-4413-ba24-4a73ae4d6e0d",
+      "name": "subreddit_info",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://oauth.reddit.com/r/chatgpt/about",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "id": "139721fa-e620-422b-b662-b37b55c24b47",
+      "name": "about",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        420
+      ],
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "7ZOtbcEUu0M9jz3L",
+          "name": "Reddit account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://oauth.reddit.com/{{ $json.fields.subreddit_name }}/top",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "id": "a54828a9-24eb-4c68-b9e0-4da11b313bc7",
+      "name": "top_posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        620
+      ],
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "7ZOtbcEUu0M9jz3L",
+          "name": "Reddit account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d44a51e5-4e8d-4f20-a2b6-d05b9c6b9e98",
+              "name": "post_id_t3",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "2ab8ee14-4aae-411b-8ec3-d4d0530f08bf",
+              "name": "author_id_t2",
+              "value": "={{ $json.author_fullname }}",
+              "type": "string"
+            },
+            {
+              "id": "d8a24820-653b-4df0-8136-2d431225add5",
+              "name": "subreddit_id_t5",
+              "value": "={{ $json.subreddit_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9c2ad780-a2fd-451c-8749-e865cf25c84a",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "31fe7e4b-68ae-4127-b0a8-c5b22647c27f",
+              "name": "body",
+              "value": "={{ $json.selftext }}",
+              "type": "string"
+            },
+            {
+              "id": "ea71d787-ff52-49eb-b4f1-a1201f8a49dd",
+              "name": "created_utc",
+              "value": "={{ $json.created_utc }}",
+              "type": "number"
+            },
+            {
+              "id": "14eeb94b-8a3b-4661-bd50-896b4d5e58bd",
+              "name": "score",
+              "value": "={{ $json.score }}",
+              "type": "string"
+            },
+            {
+              "id": "079d18e2-3bde-4395-ad9e-4c9dc5711332",
+              "name": "upvote_ratio",
+              "value": "={{ $json.upvote_ratio }}",
+              "type": "string"
+            },
+            {
+              "id": "c47d5bbb-886b-4b63-9acf-89a310b5004c",
+              "name": "num_comments",
+              "value": "={{ $json.num_comments }}",
+              "type": "string"
+            },
+            {
+              "id": "41eeb1fb-c7a4-43e8-9b64-faab530f375c",
+              "name": "total_awards_received",
+              "value": "={{ $json.total_awards_received }}",
+              "type": "string"
+            },
+            {
+              "id": "2043f7a5-784e-4301-8473-df9961d2b703",
+              "name": "permalink",
+              "value": "={{ $json.permalink }}",
+              "type": "string"
+            },
+            {
+              "id": "98cbfcdf-f75f-482e-9fa7-7e708dc2c3c3",
+              "name": "media_preview_link",
+              "value": "={{ $json.media_preview_link }}",
+              "type": "string"
+            },
+            {
+              "id": "2b5020d3-84a3-484b-91e9-5718ec6ea9bd",
+              "name": "post_id_raw",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e3274377-1154-46e3-8582-ef46e43b39f9",
+      "name": "post",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 0. Assuming your parsed comments are in a variable called commentsArray\n// Parsing the array of comments from the Reddit API response\nconst parsedItems = $json[\"data\"][\"children\"].map(child => {\n  return { json: child.data };\n});\n\n// 1. Clean the text of the \"selftext\" and \"body\" field and ensure the double quotes are escaped and do not interrupt JSON file reading\nparsedItems.forEach(item => {\n  if (item.json.title) {\n    item.json.title = item.json.title.replace(/\"/g, '\\\\\"');\n  }\n});\n\nparsedItems.forEach(item => {\n  if (item.json.selftext) {\n    item.json.selftext = item.json.selftext.replace(/\"/g, '\\\\\"');\n  }\n});\n\n// 2. Iterate over each numeric field and convert possible array datatype to a numerical value\nconst numericFields = ['ups', 'num_comments', 'score', 'created_utc']; // Add any other numeric fields as needed\n\nparsedItems.forEach(item => {\n  numericFields.forEach(field => {\n    // Check if the field is an array and flatten it if it's a single-element array\n    if (Array.isArray(item.json[field]) && item.json[field].length === 1) {\n      item.json[field] = item.json[field][0];\n    }\n\n    // Convert the value to a number if it's still not a number\n    if (typeof item.json[field] !== 'number') {\n      item.json[field] = Number(item.json[field]);\n    }\n\n    // Handle NaN values to prevent errors\n    if (isNaN(item.json[field])) {\n      item.json[field] = 0; // Or any default value you prefer\n    }\n  });\n\n  // 3. Check if media_metadata exists and construct the media preview link\n  if (item.json.media_metadata) {\n    let firstMediaItemKey = Object.keys(item.json.media_metadata)[0]; // Get the first media item key\n    let mediaItem = item.json.media_metadata[firstMediaItemKey]; // Access the media item\n    \n    if (mediaItem && mediaItem.s) {\n      // Extract the base URL and signature from the \"s\" field\n      let baseUrl = mediaItem.s.u.split('?')[0]; // Get base URL before query parameters\n      let width = mediaItem.s.x; // Width from the source image\n      let signature = mediaItem.s.u.match(/s=([a-zA-Z0-9]+)/)[1]; // Extract signature\n\n      // Construct the final URL with the formula\n      let finalUrl = `${baseUrl}?width=${width}&format=pjpg&auto=webp&s=${signature}`;\n\n      // Add the final URL as a new field called \"media_preview_link\"\n      item.json.media_preview_link = finalUrl;\n    }\n  } else {\n    // If no media_metadata, set a default or null\n    item.json.media_preview_link = null;\n  }\n});\n\nreturn parsedItems;\n"
+      },
+      "id": "3179217f-2ce3-4f76-9eb9-7560d7c1e7a4",
+      "name": "parsing&cleaning_post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "postComment",
+        "operation": "getAll",
+        "subreddit": "={{ $('subreddit_info').item.json.subreddit_name_raw }}",
+        "postId": "={{ $('post').item.json.post_id_raw }}",
+        "limit": 10
+      },
+      "id": "85f0e021-bdf2-49da-8b63-77504d6832a2",
+      "name": "Reddit",
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        500,
+        820
+      ],
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "7ZOtbcEUu0M9jz3L",
+          "name": "Reddit account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appCGNT8w6bwFwLxY",
+          "mode": "list",
+          "cachedResultName": "social_media_automation",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblVzjUWrqsJWGwOX",
+          "mode": "list",
+          "cachedResultName": "post",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY/tblVzjUWrqsJWGwOX"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id_t3": "={{ $json.post_id_t3 }}",
+            "author_id_t2": "={{ $json.author_id_t2 }}",
+            "subreddit_id_t5": "={{ $json.subreddit_id_t5 }}",
+            "title": "={{ $json.title }}",
+            "body": "={{ $json.body }}",
+            "created_at_utc": "={{ $json.created_utc }}",
+            "score": "={{ $json.score }}",
+            "upvote_ratio": "={{ $json.upvote_ratio }}",
+            "num_comments": "={{ $json.num_comments }}",
+            "total_awards_received": "={{ $json.total_awards_received }}",
+            "permalink": "={{ $json.permalink }}",
+            "[on_hold]media_preview_link": "={{ $json.media_preview_link }}"
+          },
+          "matchingColumns": [
+            "post_id_t3"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "post_id_t3",
+              "displayName": "post_id_t3",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "author_id_t2",
+              "displayName": "author_id_t2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "subreddit_id_t5",
+              "displayName": "subreddit_id_t5",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at_utc",
+              "displayName": "created_at_utc",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "upvote_ratio",
+              "displayName": "upvote_ratio",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "num_comments",
+              "displayName": "num_comments",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total_awards_received",
+              "displayName": "total_awards_received",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "permalink",
+              "displayName": "permalink",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "[on_hold]media_preview_link",
+              "displayName": "[on_hold]media_preview_link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3ac038ee-367c-4007-90e1-246277ab2d86",
+      "name": "upsert_post",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1180,
+        620
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appCGNT8w6bwFwLxY",
+          "mode": "list",
+          "cachedResultName": "social_media_automation",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXMpMmIAzahvMMQ",
+          "mode": "list",
+          "cachedResultName": "comment",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY/tblXMpMmIAzahvMMQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comment_id_t1": "={{ $json.name }}",
+            "author_id_t2": "={{ $json.author_fullname }}",
+            "parent_id_t3": "={{ $json.parent_id }}",
+            "body": "={{ $json.body }}",
+            "created_at_utc": "={{ $json.created_utc }}",
+            "permalink": "={{ $json.permalink }}",
+            "ups": "={{ $json.ups }}",
+            "score": "={{ $json.score }}",
+            "total_awards_received": "={{ $json.total_awards_received }}"
+          },
+          "matchingColumns": [
+            "comment_id_t1"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "comment_id_t1",
+              "displayName": "comment_id_t1",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "author_id_t2",
+              "displayName": "author_id_t2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "parent_id_t3",
+              "displayName": "parent_id_t3",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ups",
+              "displayName": "ups",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total_awards_received",
+              "displayName": "total_awards_received",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at_utc",
+              "displayName": "created_at_utc",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "permalink",
+              "displayName": "permalink",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "97ed4210-ece7-4433-9798-1c8843e4c9e6",
+      "name": "upsert_comment",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1180,
+        820
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/simulate-trigger1",
+        "options": {}
+      },
+      "id": "3e0221bd-513b-4612-bae6-315d121be4ab",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        420
+      ],
+      "webhookId": "48cae602-653a-403f-9a11-d5d6bfa54673"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "upsert_subreddit": {
+      "main": [
+        [
+          {
+            "node": "top_posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subreddit_info": {
+      "main": [
+        [
+          {
+            "node": "upsert_subreddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "about": {
+      "main": [
+        [
+          {
+            "node": "subreddit_info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "top_posts": {
+      "main": [
+        [
+          {
+            "node": "parsing&cleaning_post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post": {
+      "main": [
+        [
+          {
+            "node": "upsert_post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parsing&cleaning_post": {
+      "main": [
+        [
+          {
+            "node": "post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit": {
+      "main": [
+        [
+          {
+            "node": "upsert_comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upsert_post": {
+      "main": [
+        [
+          {
+            "node": "Reddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "about",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/New_York",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "ce84b44c-a0e7-4978-9730-1b221bfe1eb4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a88f88617e71d815b4e96900b8be5a72f76da06040e3b416de5992a392d9ec5c"
+  },
+  "id": "vctRz2lAvasylX2u",
+  "tags": []
+}

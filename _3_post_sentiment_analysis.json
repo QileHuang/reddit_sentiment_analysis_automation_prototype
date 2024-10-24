@@ -1,0 +1,714 @@
+{
+  "name": "[3]post_sentiment_analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appCGNT8w6bwFwLxY",
+          "mode": "list",
+          "cachedResultName": "social_media_automation",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblciuroHDhp1JFdg",
+          "mode": "list",
+          "cachedResultName": "post_sentiment_analysis",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY/tblciuroHDhp1JFdg"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $json.post_id }}",
+            "sentiment_score": "={{ $json.sentiment_score }}",
+            "happiness": "={{ $json.happiness }}",
+            "sadness": "={{ $json.sadness }}",
+            "fear": "={{ $json.fear }}",
+            "anger": "={{ $json.anger }}",
+            "surprise": "={{ $json.surprise }}",
+            "disgust": "={{ $json.disgust }}",
+            "created_at_utc": "={{ $json.created_at_utc }}",
+            "final_weight": "={{ $json.final_weight }}"
+          },
+          "matchingColumns": [
+            "post_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at_utc",
+              "displayName": "created_at_utc",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "final_weight",
+              "displayName": "final_weight",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sentiment_score",
+              "displayName": "sentiment_score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "happiness",
+              "displayName": "happiness",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sadness",
+              "displayName": "sadness",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fear",
+              "displayName": "fear",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "anger",
+              "displayName": "anger",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "surprise",
+              "displayName": "surprise",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "disgust",
+              "displayName": "disgust",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7208b0ae-61a3-4dbd-b3b1-108ca818dec4",
+      "name": "Airtable2",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1860,
+        820
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to calculate weight using the square root method with total awards\nfunction calculateWeightWithAwards(upvotes, downvotes, num_comments, total_awards_received, created_at_utc, post_bonus = false, w_U = 1, w_D = 1, w_C = 0.5, w_A = 3, beta = 0.2, lambda_decay = 0.1) {\n    // Convert created_at_utc to a number if it's a string\n    created_at_utc = parseFloat(created_at_utc);\n\n    // Get the current time in seconds (convert milliseconds to seconds)\n    const t_now = Date.now() / 1000;\n\n    // Calculate time elapsed in days\n    const time_elapsed = (t_now - created_at_utc) / (60 * 60 * 24);\n\n    // Calculate time decay\n    const time_decay = Math.exp(-lambda_decay * time_elapsed);\n\n    // Calculate engagement score\n    let engagement_score = Math.max(1, w_U * upvotes - w_D * downvotes + w_C * num_comments + w_A * total_awards_received);\n\n    // Apply post bonus if applicable\n    if (post_bonus) {\n        engagement_score *= (1 + beta);\n    }\n\n    // Calculate the final weight using square root transformation and time decay\n    const final_weight = Math.sqrt(engagement_score) * time_decay;\n\n    return final_weight;\n}\n\n// Strip down the JSON and process data\nfunction processBatch(items) {\n    const results = [];\n\n    // Loop through each item in the input\n    items.forEach(item => {\n        // Strip down to the required fields and validate them\n        const record = item.json && item.json.fields ? item.json.fields : null;\n\n        if (record) {\n            const entity_id = record.entity_id || 'N/A';\n            const parent_id = record.parent_id || 'N/A';\n            const title = record.title || 'N/A';\n            const body = record.body || '';\n\n            const upvotes = isNaN(parseFloat(record.upvotes)) ? 0 : parseFloat(record.upvotes);\n            const downvotes = isNaN(parseFloat(record.downvotes)) ? 0 : parseFloat(record.downvotes);\n            const num_comments = isNaN(parseFloat(record.num_comments)) ? 0 : parseFloat(record.num_comments);\n            const total_awards_received = isNaN(parseFloat(record.total_awards_received)) ? 0 : parseFloat(record.total_awards_received);\n            const created_at_utc = isNaN(parseFloat(record.created_at_utc)) ? 0 : parseFloat(record.created_at_utc);\n\n            // Check if it's a post based on the presence of title\n            const post_bonus = title !== 'N/A';\n\n            // Calculate final weight\n            const final_weight = calculateWeightWithAwards(upvotes, downvotes, num_comments, total_awards_received, created_at_utc, post_bonus);\n\n            // Store the result\n            results.push({\n                entity_id: entity_id,\n                parent_id: parent_id,\n                title: title,\n                body: body,\n                upvotes: upvotes,\n                downvotes: downvotes,\n                num_comments: num_comments,\n                total_awards_received: total_awards_received,\n                created_at_utc: created_at_utc,\n                final_weight: final_weight\n            });\n        } else {\n            // Log the missing or invalid record for debugging\n            console.error('Missing or invalid fields in item:', item);\n        }\n    });\n\n    // Return the results in the required format\n    return results.map(result => ({ json: result }));\n}\n\n// Execute the batch processing and return the modified items\nreturn processBatch(items);\n"
+      },
+      "id": "1fcd3d1c-4831-47b6-983c-ab5b86447402",
+      "name": "engagement_bonus_calculation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.airtable.com/v0/appCGNT8w6bwFwLxY/gpt_output_cache",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "airtableTokenApi",
+        "options": {}
+      },
+      "id": "21e46b57-0e37-4f35-9364-86a14360bf31",
+      "name": "HTTP_Request_post2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        680
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to cleanly extract JSON content between <START> and <END> tags\nfunction extractJSON(content) {\n  const startTag = \"<START>\";\n  const endTag = \"<END>\";\n\n  // Find the index positions of <START> and <END>\n  const startIndex = content.indexOf(startTag) + startTag.length;\n  const endIndex = content.indexOf(endTag);\n\n  // Extract the JSON string\n  const jsonString = content.slice(startIndex, endIndex).trim();\n\n  // Parse the JSON string\n  return JSON.parse(jsonString);\n}\n\n// Process each item from the incoming n8n workflow\nconst output = items.map(item => {\n  const content = item.json.content;  // Get the content field\n  const parsedData = extractJSON(content);  // Extract and parse the JSON\n\n  // Return the parsed data for further workflow processing\n  return parsedData.map(parsedItem => {\n    return {\n      json: parsedItem\n    };\n  });\n});\n\n// Flatten the output array if multiple entries were parsed\nreturn [].concat(...output);\n"
+      },
+      "id": "7446acd6-f040-4cfd-99ba-78801196c476",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.airtable.com/v0/appCGNT8w6bwFwLxY/sentiment_analysis_cache",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "airtableTokenApi",
+        "options": {}
+      },
+      "id": "48b60400-2acf-4891-ab1e-947c7ef44849",
+      "name": "HTTP_Request_post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        840
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.records.map(record => {\n  return { json: record };\n});\n"
+      },
+      "id": "d7bc3ae9-6470-490d-b3da-8889f8b7a341",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.records.map(record => {\n  return { json: record };\n});\n"
+      },
+      "id": "a5abd0c2-2859-4cc2-8d8f-48470356f779",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f68535c2-2606-47f9-bfe8-954289257c84",
+              "name": "content",
+              "value": "={{ $json.fields.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9c01d6a5-af95-437b-92b6-df3a262cccb1",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        860,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT distinct\n  parent_id as post_id,\n  sum(final_weight) as final_weight,\n  sum(balanced_sentiment_score) as sentiment_score,\n  sum(balanced_happiness) as happiness,\n  sum(balanced_sadness) as sadness,\n  sum(balanced_fear) as fear,\n  sum(balanced_anger) as anger,\n  sum(balanced_surprise) as surprise,\n  sum(balanced_disgust) as disgust,\n  min(created_at_utc) as created_at_utc\n\nfrom input1\ngroup by parent_id"
+      },
+      "id": "879def84-4eb2-4ea7-a385-32e0b1a77bcb",
+      "name": "Merge3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1640,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT distinct\n  i1.entity_id as entity_id,\n  i1.parent_id as parent_id,\n  i2.final_weight,\n  i1.title,\n  i1.body,\n  i1.sentiment_score * i2.final_weight as balanced_sentiment_score,\n  i1.happiness_vector * i2.final_weight as balanced_happiness,\n  i1.sadness_vector * i2.final_weight as balanced_sadness,\n  i1.fear_vector * i2.final_weight as balanced_fear,\n  i1.anger_vector * i2.final_weight as balanced_anger,\n  i1.surprise_vector * i2.final_weight as balanced_surprise,\n  i1.disgust_vector * i2.final_weight as balanced_disgust,\n  i1.context_reading as context_reading,\n  i2.created_at_utc\n\nfrom input1 i1 join input2 i2\n  on i1.entity_id = i2.entity_id"
+      },
+      "id": "e5535d91-71c2-4667-acd0-3f03b59f8240",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1300,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/simulate-trigger3",
+        "options": {}
+      },
+      "id": "3fddc1d8-d77a-4e06-b5b3-0fabfdd8eaec",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        180,
+        760
+      ],
+      "webhookId": "48cae602-653a-403f-9a11-d5d6bfa54673"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appCGNT8w6bwFwLxY",
+          "mode": "list",
+          "cachedResultName": "social_media_automation",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl6dHuA8DYk51hWz",
+          "mode": "list",
+          "cachedResultName": "sentiment_analysis_cache",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY/tbl6dHuA8DYk51hWz"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "entity_id": "={{ $json.entity_id }}",
+            "sentiment_score": "={{ $json.sentiment_score }}",
+            "happiness_vector": "={{ $json.happiness_vector }}",
+            "sadness_vector": "={{ $json.sadness_vector }}",
+            "fear_vector": "={{ $json.fear_vector }}",
+            "anger_vector": "={{ $json.anger_vector }}",
+            "surprise_vector": "={{ $json.surprise_vector }}",
+            "disgust_vector": "={{ $json.disgust_vector }}"
+          },
+          "matchingColumns": [
+            "entity_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "entity_id",
+              "displayName": "entity_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "parent_id",
+              "displayName": "parent_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "sentiment_score",
+              "displayName": "sentiment_score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "happiness_vector",
+              "displayName": "happiness_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sadness_vector",
+              "displayName": "sadness_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fear_vector",
+              "displayName": "fear_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "anger_vector",
+              "displayName": "anger_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "surprise_vector",
+              "displayName": "surprise_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "disgust_vector",
+              "displayName": "disgust_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "upvotes",
+              "displayName": "upvotes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "downvotes",
+              "displayName": "downvotes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "num_comments",
+              "displayName": "num_comments",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "created_at_utc",
+              "displayName": "created_at_utc",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "total_awards_received",
+              "displayName": "total_awards_received",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c7f355f1-2390-465f-b02d-5df31999e35c",
+      "name": "Airtable1",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        520
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "engagement_bonus_calculation": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP_Request_post2": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_Request_post": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "engagement_bonus_calculation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Airtable2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP_Request_post2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP_Request_post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c721a9f7-ee34-43ec-843b-70d3b7d36ab3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a88f88617e71d815b4e96900b8be5a72f76da06040e3b416de5992a392d9ec5c"
+  },
+  "id": "MiuKKchHDg8MYDRl",
+  "tags": []
+}

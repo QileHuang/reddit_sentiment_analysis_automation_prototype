@@ -1,0 +1,1089 @@
+{
+  "name": "[2]reddit_sentiment_analysis_nlp",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get the response from the previous HTTP Request node (comment data)\nconst commentRecords = $json.records;\n\n// Initialize an empty array to store the processed comment records\nlet processedComments = [];\n\n// Loop through each comment record and map it to the desired format\ncommentRecords.forEach(record => {\n  processedComments.push({\n    json: {\n      id: record.id,\n      createdTime: record.createdTime,\n      comment_id_t1: record.fields.comment_id_t1,\n      author_id_t2: record.fields.author_id_t2,\n      parent_id_t3: record.fields.parent_id_t3,\n      body: record.fields.body,\n      created_at_utc: record.fields.created_at_utc,\n      permalink: record.fields.permalink,\n      score: record.fields.score,\n      ups: record.fields.ups\n    }\n  });\n});\n\n// Return the processed comment records to be passed to the next node\nreturn processedComments;\n"
+      },
+      "id": "6f7f2b7b-4d7f-4845-96c7-ac8b863c97ae",
+      "name": "comment_data_cleaning",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the response from the previous HTTP Request node\nconst records = $json.records;\n\n// Initialize an empty array to store the processed records\nlet processedRecords = [];\n\n// Loop through each record and map it to the desired format\nrecords.forEach(record => {\n  processedRecords.push({\n    json: {\n      id: record.id,\n      createdTime: record.createdTime,\n      post_id_t3: record.fields.post_id_t3,\n      author_id_t2: record.fields.author_id_t2,\n      subreddit_id_t5: record.fields.subreddit_id_t5,\n      created_at_utc: record.fields.created_at_utc,\n      score: record.fields.score,\n      upvote_ratio: record.fields.upvote_ratio,\n      num_comments: record.fields.num_comments,\n      total_awards_received: record.fields.total_awards_received,\n      permalink: record.fields.permalink,\n      title: record.fields.title,\n      body: record.fields.body || '', // Use an empty string if body is not available\n    }\n  });\n});\n\n// Return the processed records to be passed to the next node\nreturn processedRecords;\n"
+      },
+      "id": "57befcc5-ba08-4150-9847-d8048726292a",
+      "name": "post_data_cleaning",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "72cd44fb-94e1-42e0-8d58-383c2e16f21a",
+              "name": "post_id_t3",
+              "value": "={{ $json.post_id_t3 }}",
+              "type": "string"
+            },
+            {
+              "id": "da03486f-6ebd-4cbb-bf52-8f765650493b",
+              "name": "subreddit_id_t5",
+              "value": "={{ $json.subreddit_id_t5 }}",
+              "type": "string"
+            },
+            {
+              "id": "59d7c62a-616b-4145-843f-2ac3331a906c",
+              "name": "created_at_utc",
+              "value": "={{ $json.created_at_utc }}",
+              "type": "string"
+            },
+            {
+              "id": "165a8671-4472-4cb7-8b96-6b8e50b216cb",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "28318e08-0d3d-4424-a7f6-cb13356f1eb0",
+              "name": "post_body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "77816bcb-9308-4a07-85e0-c9d20520d914",
+              "name": "author_id_t2",
+              "value": "={{ $json.author_id_t2 }}",
+              "type": "string"
+            },
+            {
+              "id": "a9703dc5-6173-4375-9aa7-2bfce974a30f",
+              "name": "score",
+              "value": "={{ $json.score }}",
+              "type": "string"
+            },
+            {
+              "id": "1f01144a-20e8-4bda-98c6-a9c505e1fdea",
+              "name": "upvote_ratio",
+              "value": "={{ $json.upvote_ratio }}",
+              "type": "string"
+            },
+            {
+              "id": "18231cab-7cb6-425b-a866-0b91fff91a7e",
+              "name": "num_comments",
+              "value": "={{ $json.num_comments }}",
+              "type": "string"
+            },
+            {
+              "id": "2c7d8156-37a3-49e6-94b6-942b52d3a060",
+              "name": "total_awards_received",
+              "value": "={{ $json.total_awards_received }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b8fdb3c9-6030-4033-a901-ab1bde2832b2",
+      "name": "post_fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b338f6c4-78c5-4dc3-88e1-0c3a9f59d6ef",
+              "name": "comment_id_t1",
+              "value": "={{ $json.comment_id_t1 }}",
+              "type": "string"
+            },
+            {
+              "id": "b468a862-3a9f-4e05-a2ed-0d40d2f568c6",
+              "name": "author_id_t2",
+              "value": "={{ $json.author_id_t2 }}",
+              "type": "string"
+            },
+            {
+              "id": "fa1e4896-09f0-4648-ba44-32b5edffdd29",
+              "name": "parent_id_t3",
+              "value": "={{ $json.parent_id_t3 }}",
+              "type": "string"
+            },
+            {
+              "id": "7770fa64-a631-4ec9-99f5-2590c1bfaf75",
+              "name": "comment_body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "4374a7b8-ebbf-48c9-810a-0e6956bd6879",
+              "name": "created_at_utc",
+              "value": "={{ $json.created_at_utc }}",
+              "type": "string"
+            },
+            {
+              "id": "e86bea04-fae5-4d56-b1c7-83916b63f8f7",
+              "name": "permalink",
+              "value": "={{ $json.permalink }}",
+              "type": "string"
+            },
+            {
+              "id": "61a60ea3-1530-4fb9-84f1-79e3137a1a5b",
+              "name": "comment_score",
+              "value": "={{ $json.score }}",
+              "type": "string"
+            },
+            {
+              "id": "a533a09a-94b3-4621-88d0-42530275b8f0",
+              "name": "comment_upvotes",
+              "value": "={{ $json.ups }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "26bbb428-a28f-402e-9385-5b6f3e463c0e",
+      "name": "comment_fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all(); // Get all input data\n\nconst urlRegex = /(https?:\\/\\/[^\\s]+)/g; // Regular expression to match URLs\nconst newlineRegex = /\\n/g; // Regular expression to match newlines\n\nconst sanitizedData = inputData.map(item => {\n    return {\n        ...item.json,\n        body: item.json.body\n            .replace(urlRegex, '[external reference]')  // Replace URLs with \"external reference\"\n            .replace(newlineRegex, ' ')  // Replace newlines with a space\n    };\n});\n\nreturn sanitizedData; // Return the entire mapped array\n"
+      },
+      "id": "19d564ab-e8da-432d-b9c0-5172cb28c365",
+      "name": "cleaning_for_censorship",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2260,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.airtable.com/v0/{{ $json.airtable_base_id }}/{{ $json.comment }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "airtableTokenApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "ce59bb79-3423-4ad0-948b-75eff119e3b7",
+      "name": "HTTP_Request_comment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        900
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.airtable.com/v0/{{ $json.airtable_base_id }}/{{ $json.post }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "airtableTokenApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "1bf0a349-ea8f-404b-a959-8bf8a7e7c8e1",
+      "name": "HTTP_Request_post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        700
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "7651a234-fad3-4789-8f4e-7663047d3475",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2680,
+        800
+      ],
+      "executeOnce": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an array to hold all the records\nlet combinedData = [];\n\n// Loop through each item in the dataset (items contain your input records)\nitems.forEach(item => {\n  const record = item.json;\n\n  // Push each record into the combinedData array\n  combinedData.push({\n    entity_id: record.entity_id,\n    parent_id: record.parent_id,\n    title: record.title,\n    body: record.body\n  });\n});\n\n// Now, construct a single prompt that encapsulates all items in the combined data\nlet prompt = `\n  Please analyze the following text entries based on the Six Basic Emotions model by Paul Ekman. The emotions to evaluate include happiness, sadness, fear, anger, surprise, and disgust. The sentiment score should range between 0 and 1, and each of the 6 emotional vectors should be assigned a value between 0 and 1. Round all the numbers in these fields to 2 decimal places.\n\n  **Important Instructions**:\n  1. **Never alter** the \\`<START>\\` and \\`<END>\\` tags in any way. They should be used **exactly as is**.\n  2. **Ensure** the \\`<START>\\` tag is placed at the very beginning of the response, with nothing outputted before it.\n  3. **Ensure** the \\`<END>\\` tag is placed at the very end of the response, with nothing outputted after it.\n  4. **All content between the \\`<START>\\` and \\`<END>\\` tags must be in valid JSON format**, with no extra line breaks or escape characters like \\\\n or \\\\\\\\.\n\n  The output format should be:\n  \\`<START>\\`\n  [\n    {\n      \"entity_id\": \"example_entity_id\",\n      \"parent_id\": \"example_parent_id\",\n      \"title\": \"example_title\",\n      \"body\": \"example_body\",\n      \"sentiment_score\": <sentiment_score>,\n      \"happiness_vector\": <happiness_value>,\n      \"sadness_vector\": <sadness_value>,\n      \"fear_vector\": <fear_value>,\n      \"anger_vector\": <anger_value>,\n      \"surprise_vector\": <surprise_value>,\n      \"disgust_vector\": <disgust_value>\n    }\n    // Add more entries like this\n  ]\n  \\`<END>\\`\n\n  ### Input:\n  ${JSON.stringify(combinedData, null, 2)}\n\n  Ensure that nothing is outputted before \\`<START>\\` and nothing after \\`<END>\\`, and everything is in between the tags.\n`;\n\n// Remove any new line characters from the prompt\nprompt = prompt.replace(/\\n/g, '');\n\n// Return the single prompt to be processed by GPT\nreturn [{\n  json: {\n    prompt: prompt  // The entire batch is processed as a single prompt\n  }\n}];\n"
+      },
+      "id": "07f18854-917f-42d1-9bd4-fd9cb1889e85",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2900,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45dfe0c8-5dc5-4d9a-ac89-ebf5ddd2c302",
+              "name": "content",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            },
+            {
+              "id": "6e01c1e6-229e-4758-af03-c4db79f53806",
+              "name": "total_tokens",
+              "value": "={{ $json.usage.total_tokens }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2eeca49f-3ac5-467f-a8cb-a8d874899d9b",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3280,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer: 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a sentiment analysis assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.prompt) }}\n    }\n  ],\n  \"max_tokens\": 3000,\n  \"temperature\": 0,\n  \"top_p\": 1,\n  \"frequency_penalty\": 0,\n  \"presence_penalty\": 0\n}\n",
+        "options": {}
+      },
+      "id": "f64b7ec9-a6fd-45dd-999f-ba30e1933ece",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3100,
+        800
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "HQHV95IGlgUkGgwT",
+          "name": "OpenAi account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5072d3eb-0ea0-4467-803a-169698c0c286",
+              "name": "entity_id",
+              "value": "={{ $json.entity_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ae7b85dd-4d16-4420-8c38-e52be20e9b13",
+              "name": "parent_id",
+              "value": "={{ $json.parent_id }}",
+              "type": "string"
+            },
+            {
+              "id": "99b1630a-f138-4f09-a756-c1521c43bc41",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "311a7c70-99f2-49fa-b670-c80dc51008ec",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "d62a3202-c2f5-45b7-8578-96b53c582c06",
+              "name": "upvotes",
+              "value": "={{ $json.upvotes }}",
+              "type": "string"
+            },
+            {
+              "id": "972ef550-9c98-4891-9652-12e103217307",
+              "name": "downvotes",
+              "value": "={{ $json.downvotes }}",
+              "type": "string"
+            },
+            {
+              "id": "87312b12-637c-429f-bb19-574f905c0664",
+              "name": "num_comments",
+              "value": "={{ $json.num_comments }}",
+              "type": "string"
+            },
+            {
+              "id": "2eed918a-6df6-401e-b4c2-44332942d05a",
+              "name": "created_at_utc",
+              "value": "={{ $json.created_at_utc }}",
+              "type": "string"
+            },
+            {
+              "id": "d7ec5110-c833-4453-8f8c-68ad136ac0c4",
+              "name": "total_awards_received",
+              "value": "={{ $json.total_awards_received }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f3a37360-877f-44d7-a831-b235f9d15dbb",
+      "name": "sentiment_data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2040,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appCGNT8w6bwFwLxY",
+          "mode": "list",
+          "cachedResultName": "social_media_automation",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLanace0R4Qh9a0",
+          "mode": "list",
+          "cachedResultName": "gpt_output_cache",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY/tblLanace0R4Qh9a0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "content": "={{ $json.content }}",
+            "total_tokens": "={{ $json.total_tokens }}"
+          },
+          "matchingColumns": [
+            "content"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total_tokens",
+              "displayName": "total_tokens",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a0cb438-ba10-45ee-8788-ea39fc1c2ad6",
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3720,
+        800
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "29c9e9dd-0e0d-4229-afd6-b78d11f65265",
+              "name": "airtable_base_id",
+              "value": "appCGNT8w6bwFwLxY",
+              "type": "string"
+            },
+            {
+              "id": "e043857e-72cf-4498-870d-9b14febd905c",
+              "name": "subreddit_table_id",
+              "value": "tblFkMIwWFPKC3NMp",
+              "type": "string"
+            },
+            {
+              "id": "96cc7db6-8d67-45ab-9149-0b162ce29b60",
+              "name": "post_table_id",
+              "value": "tblVzjUWrqsJWGwOX",
+              "type": "string"
+            },
+            {
+              "id": "a72ba1d6-0f46-4721-a84e-c1cae960aaad",
+              "name": "comment_table_id",
+              "value": "tblXMpMmIAzahvMMQ",
+              "type": "string"
+            },
+            {
+              "id": "0f59f0bd-7fa0-493f-aebe-189aa1143471",
+              "name": "subreddit_sentiment_analysis_table_id",
+              "value": "tbl5FUO1E1JNKy0gM",
+              "type": "string"
+            },
+            {
+              "id": "1ddf35e3-96ad-4ffa-a4ae-3ba8e36ca40d",
+              "name": "post_sentiment_analysis_table_id",
+              "value": "tblciuroHDhp1JFdg",
+              "type": "string"
+            },
+            {
+              "id": "cd113304-0672-4724-88b1-2a074e225322",
+              "name": "subreddit",
+              "value": "subreddit",
+              "type": "string"
+            },
+            {
+              "id": "36693fba-d800-4cce-8eb8-178c2855991e",
+              "name": "post",
+              "value": "post",
+              "type": "string"
+            },
+            {
+              "id": "faf95647-d617-4dd5-aba2-3224f29e344d",
+              "name": "comment",
+              "value": "comment",
+              "type": "string"
+            },
+            {
+              "id": "11aa58fc-420f-4cb4-b4ec-be7eab96fe74",
+              "name": "subreddit_sentiment_analysis",
+              "value": "subreddit_sentiment_analysis",
+              "type": "string"
+            },
+            {
+              "id": "17e58fda-c605-4503-ab32-3fac6da21098",
+              "name": "post_sentiment_analysis",
+              "value": "post_sentiment_analysis",
+              "type": "string"
+            },
+            {
+              "id": "940316e9-b006-4ff5-a294-db30c91bb45d",
+              "name": "sentiment_analysis_cache",
+              "value": "tbl6dHuA8DYk51hWz",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "528ddcd1-2b57-4f1b-9dfa-fd9c336c5d46",
+      "name": "parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to remove newlines safely\nfunction removeNewlines(str) {\n    if (typeof str === 'string') {\n        return str.replace(/\\n/g, '');\n    }\n    return str;  // If it's not a string, return as is\n}\n\n// Parse content and process each item safely\nconst output = items.map(item => {\n    const content = item.json.content || \"\";  // Ensure content is defined\n    const cleanedContent = removeNewlines(content);  // Remove newlines from content\n\n    return {\n        json: {\n            ...item.json,  // Preserve the original data\n            content: cleanedContent  // Replace 'content' with the cleaned version\n        }\n    };\n});\n\n// Return the array of modified items\nreturn output;\n"
+      },
+      "id": "182687e0-b762-4bf3-a742-678b6eeca2fa",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3500,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appCGNT8w6bwFwLxY",
+          "mode": "list",
+          "cachedResultName": "social_media_automation",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl6dHuA8DYk51hWz",
+          "mode": "list",
+          "cachedResultName": "sentiment_analysis_cache",
+          "cachedResultUrl": "https://airtable.com/appCGNT8w6bwFwLxY/tbl6dHuA8DYk51hWz"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "entity_id": "={{ $json.entity_id }}",
+            "parent_id": "={{ $json.parent_id }}",
+            "title": "={{ $json.title }}",
+            "body": "={{ $json.body }}",
+            "upvotes": "={{ $json.upvotes }}",
+            "downvotes": "={{ $json.downvotes }}",
+            "num_comments": "={{ $json.num_comments }}",
+            "created_at_utc": "={{ $json.created_at_utc }}",
+            "total_awards_received": "={{ $json.total_awards_received }}"
+          },
+          "matchingColumns": [
+            "entity_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "entity_id",
+              "displayName": "entity_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "parent_id",
+              "displayName": "parent_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sentiment_score",
+              "displayName": "sentiment_score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "happiness_vector",
+              "displayName": "happiness_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "sadness_vector",
+              "displayName": "sadness_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "fear_vector",
+              "displayName": "fear_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "anger_vector",
+              "displayName": "anger_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "surprise_vector",
+              "displayName": "surprise_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "disgust_vector",
+              "displayName": "disgust_vector",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "context_reading",
+              "displayName": "context_reading",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "upvotes",
+              "displayName": "upvotes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "downvotes",
+              "displayName": "downvotes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "num_comments",
+              "displayName": "num_comments",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at_utc",
+              "displayName": "created_at_utc",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total_awards_received",
+              "displayName": "total_awards_received",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "28c48b54-8b1b-4423-bfc6-ab6607d6775f",
+      "name": "Airtable1",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2680,
+        620
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WgHUrCCNb1pzTaHh",
+          "name": "Airtable Personal Access Token account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "select post_id_t3 as entity_id,\npost_id_t3 as parent_id,\ntitle,\npost_body as body,\nround(score / (2 - (1 / upvote_ratio)),0) as upvotes,\nround((score * (1 - upvote_ratio)) / (2 * upvote_ratio - 1),0) as downvotes,\ncoalesce(total_awards_received,0) as total_awards_received,\nnum_comments,\ncreated_at_utc\nfrom input1\n  \nUNION\n\nselect comment_id_t1 as entity_id,\nparent_id_t3,\n\"N/A\" as title,\ncomment_body as body,\ncomment_upvotes,\ncomment_upvotes - comment_score as downvotes,\ncoalesce(total_awards_received,0) as total_awards_received,\n0 as num_comments,\ncreated_at_utc\nfrom input2"
+      },
+      "id": "e1c2a828-a9df-44d4-97b5-fb65159ddbd8",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1820,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/simulate-trigger2",
+        "options": {}
+      },
+      "id": "ae25c352-f1c4-4a8d-9bd1-314b180bbf20",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        660,
+        800
+      ],
+      "webhookId": "7706edc0-5dcf-4ea1-a1c1-d5cc6d791f0b"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "comment_data_cleaning": {
+      "main": [
+        [
+          {
+            "node": "comment_fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post_data_cleaning": {
+      "main": [
+        [
+          {
+            "node": "post_fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post_fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "comment_fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "cleaning_for_censorship": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_Request_comment": {
+      "main": [
+        [
+          {
+            "node": "comment_data_cleaning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_Request_post": {
+      "main": [
+        [
+          {
+            "node": "post_data_cleaning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sentiment_data": {
+      "main": [
+        [
+          {
+            "node": "cleaning_for_censorship",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parameters": {
+      "main": [
+        [
+          {
+            "node": "HTTP_Request_post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP_Request_comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "sentiment_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveExecutionProgress": true
+  },
+  "versionId": "cdc6c8d0-6d8b-450f-9fae-c947be87b5b2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a88f88617e71d815b4e96900b8be5a72f76da06040e3b416de5992a392d9ec5c"
+  },
+  "id": "ihsAZmQUlUOyaMmU",
+  "tags": []
+}
